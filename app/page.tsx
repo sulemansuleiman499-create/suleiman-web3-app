@@ -21,7 +21,7 @@ export default function Home() {
       return;
     }
     if (!recipient.startsWith('0x') || recipient.length !== 42) {
-      setStatus('Invalid address. Must be 0x followed by 40 characters.');
+      setStatus('Invalid address. Must start with 0x and be 42 characters.');
       return;
     }
 
@@ -34,91 +34,92 @@ export default function Home() {
         value: parseEther('0.001'),
       });
 
-      setStatus(`✅ Transaction sent! Hash: ${hash}`);
+      setStatus(`✅ Transaction sent successfully! Hash: ${hash}`);
       window.open(`https://sepolia.etherscan.io/tx/${hash}`, '_blank');
     } catch (err: any) {
-      setStatus(`❌ Error: ${err.message || 'Failed to send'}`);
+      setStatus(`❌ ${err.message || 'Transaction failed'}`);
     } finally {
       setIsSending(false);
     }
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gray-950 via-purple-950 to-black text-white flex items-center justify-center p-6">
-      <div className="max-w-md w-full bg-gray-900/80 backdrop-blur-xl border border-purple-500/20 rounded-3xl shadow-2xl p-10 space-y-8">
-        
-        {/* Header */}
-        <div className="text-center">
-          <div className="flex justify-center mb-4">
-            <div className="text-6xl">🚀</div>
+    <main className="min-h-screen bg-gradient-to-br from-zinc-950 via-purple-950 to-black flex items-center justify-center p-6">
+      <div className="max-w-lg w-full">
+        {/* Main Card */}
+        <div className="bg-zinc-900/90 backdrop-blur-2xl border border-purple-500/30 rounded-3xl shadow-2xl p-10 space-y-10">
+          
+          {/* Header */}
+          <div className="text-center">
+            <div className="mx-auto mb-6 w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center text-4xl shadow-lg">
+              🚀
+            </div>
+            <h1 className="text-4xl font-bold text-white">Suleiman Web3</h1>
+            <p className="text-purple-400 mt-2 text-xl">Wallet Sender</p>
           </div>
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-            Welcome Suleiman!
-          </h1>
-          <p className="mt-3 text-gray-400 text-lg">Your Web3 Wallet Sender</p>
+
+          {!isConnected ? (
+            <div className="text-center space-y-6 py-8">
+              <p className="text-2xl text-zinc-300">Connect your wallet to continue</p>
+              <ConnectButton />
+              <p className="text-sm text-zinc-500">
+                First time? Switch to <span className="text-purple-400">Sepolia testnet</span> in MetaMask
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-8">
+              {/* Wallet Info */}
+              <div className="bg-zinc-800/70 border border-zinc-700 rounded-2xl p-6 space-y-5">
+                <div>
+                  <p className="text-zinc-400 text-sm">CONNECTED WALLET</p>
+                  <p className="font-mono text-purple-300 text-sm break-all mt-1.5">
+                    {address}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-zinc-400 text-sm">BALANCE</p>
+                  <p className="text-4xl font-semibold text-emerald-400 mt-1">
+                    {balance ? parseFloat(balance.formatted).toFixed(4) : '0.0000'} ETH
+                  </p>
+                </div>
+              </div>
+
+              {/* Send Section */}
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-zinc-400 text-sm mb-2">RECIPIENT ADDRESS</label>
+                  <input
+                    type="text"
+                    placeholder="0x1234... (paste any address)"
+                    value={recipient}
+                    onChange={(e) => setRecipient(e.target.value)}
+                    className="w-full bg-zinc-800 border border-zinc-700 focus:border-purple-500 rounded-2xl px-5 py-4 text-white placeholder-zinc-500 focus:outline-none"
+                  />
+                </div>
+
+                <button
+                  onClick={handleSend}
+                  disabled={isSending || !recipient}
+                  className="w-full py-4 text-lg font-semibold bg-gradient-to-r from-purple-600 via-violet-600 to-fuchsia-600 hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed rounded-2xl transition-all duration-200 shadow-xl"
+                >
+                  {isSending ? 'Sending 0.001 ETH...' : 'Send 0.001 Test ETH'}
+                </button>
+              </div>
+
+              {status && (
+                <div className={`p-5 rounded-2xl text-center text-sm font-medium ${status.includes('✅') ? 'bg-emerald-900/60 text-emerald-400 border border-emerald-500/30' : 'bg-red-900/60 text-red-400 border border-red-500/30'}`}>
+                  {status}
+                </div>
+              )}
+            </div>
+          )}
+
+          <ConnectButton />
+
+          <p className="text-center text-xs text-zinc-500 pt-4">
+            Built with Next.js + Wagmi + RainbowKit • Sepolia Testnet
+          </p>
         </div>
-
-        {!isConnected ? (
-          <div className="text-center py-8">
-            <p className="text-xl text-gray-300 mb-6">Connect your wallet to continue</p>
-            <ConnectButton />
-            <p className="mt-8 text-sm text-gray-500">
-              First time? Switch to <span className="text-purple-400 font-medium">Sepolia testnet</span> in MetaMask.
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-8">
-            {/* Wallet Info Card */}
-            <div className="bg-gray-800/70 border border-gray-700 rounded-2xl p-6 space-y-4">
-              <div>
-                <p className="text-gray-400 text-sm">Connected Wallet</p>
-                <p className="font-mono text-purple-300 break-all text-sm mt-1">
-                  {address}
-                </p>
-              </div>
-              <div>
-                <p className="text-gray-400 text-sm">Balance</p>
-                <p className="text-3xl font-bold text-green-400">
-                  {balance ? balance.formatted : '0.00'} ETH
-                </p>
-              </div>
-            </div>
-
-            {/* Send Form */}
-            <div className="space-y-5">
-              <div>
-                <label className="text-gray-400 text-sm block mb-2">Recipient Address</label>
-                <input
-                  type="text"
-                  placeholder="0x... (paste Trust Wallet or any address)"
-                  value={recipient}
-                  onChange={(e) => setRecipient(e.target.value)}
-                  className="w-full bg-gray-800 border border-gray-700 focus:border-purple-500 rounded-2xl px-5 py-4 text-white placeholder-gray-500 focus:outline-none transition"
-                />
-              </div>
-
-              <button
-                onClick={handleSend}
-                disabled={isSending || !recipient}
-                className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:from-gray-700 disabled:to-gray-700 font-bold text-lg rounded-2xl transition-all duration-200 shadow-lg disabled:cursor-not-allowed"
-              >
-                {isSending ? 'Sending 0.001 ETH...' : 'Send 0.001 Test ETH'}
-              </button>
-            </div>
-
-            {status && (
-              <div className={`p-4 rounded-2xl text-center text-sm ${status.includes('✅') ? 'bg-green-900/50 text-green-400' : 'bg-red-900/50 text-red-400'}`}>
-                {status}
-              </div>
-            )}
-          </div>
-        )}
-
-        <ConnectButton />
-
-        <p className="text-center text-xs text-gray-500 pt-4">
-          Built with Next.js + Wagmi + RainbowKit • Sepolia Testnet
-        </p>
       </div>
     </main>
   );
