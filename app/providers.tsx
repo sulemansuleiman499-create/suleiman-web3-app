@@ -1,23 +1,23 @@
 'use client';
 
-import * as React from 'react';
-import {
-  RainbowKitProvider,
-  getDefaultConfig,
-} from '@rainbow-me/rainbowkit';
-import { WagmiProvider } from 'wagmi';
-import {
-  QueryClient,
-  QueryClientProvider,
-} from '@tanstack/react-query';
-import { http } from 'viem';
+import { getDefaultConfig } from '@rainbow-me/rainbowkit';
 import { sepolia, mainnet } from 'wagmi/chains';
+import { http } from 'viem';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { WagmiProvider } from 'wagmi';
+import { RainbowKitProvider } from '@rainbow-me/rainbowkit';
+
+const projectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || '';
+
+if (!projectId) {
+  throw new Error('Missing WalletConnect / Reown Project ID. Check your .env.local file.');
+}
 
 const config = getDefaultConfig({
   appName: 'Suleiman Web3 App',
-  projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || '',
+  projectId,
   chains: [sepolia, mainnet],
-  ssr: true,  // comma here
+  ssr: true,
   transports: {
     [sepolia.id]: http(),
     [mainnet.id]: http(),
