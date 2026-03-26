@@ -3,17 +3,36 @@
 import { useAccount, useBalance, useSendTransaction } from 'wagmi';
 import { parseEther } from 'viem';
 import ConnectButton from '../components/ConnectButton';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function Home() {
   const { address, isConnected } = useAccount();
-  const { data: balance } = useBalance({ address });
+  const { data: balance, refetch } = useBalance({ address });
 
   const [recipient, setRecipient] = useState('');
   const [status, setStatus] = useState('');
   const [isSending, setIsSending] = useState(false);
+  const [isFaucetLoading, setIsFaucetLoading] = useState(false);
 
   const { sendTransaction } = useSendTransaction();
+
+  // Auto refresh balance after faucet claim
+  useEffect(() => {
+    if (isFaucetLoading) {
+      const timer = setTimeout(() => {
+        refetch();
+        setIsFaucetLoading(false);
+        setStatus('Balance should be updated now. Check again if needed.');
+      }, 25000);
+      return () => clearTimeout(timer);
+    }
+  }, [isFaucetLoading, refetch]);
+
+  const handleGetTestETH = () => {
+    setIsFaucetLoading(true);
+    setStatus('Opening faucet... Claim 0.5 ETH then come back.');
+    window.open('https://sepoliafaucet.com', '_blank');
+  };
 
   const handleSend = async () => {
     if (!recipient) {
@@ -46,7 +65,6 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-zinc-950 via-purple-950 to-black flex items-center justify-center p-6">
       <div className="max-w-lg w-full">
-        {/* Main Card */}
         <div className="bg-zinc-900/90 backdrop-blur-2xl border border-purple-500/30 rounded-3xl shadow-2xl p-10 space-y-10">
           
           {/* Header */}
@@ -83,6 +101,15 @@ export default function Home() {
                   </p>
                 </div>
               </div>
+
+              {/* Faucet Button */}
+              <button
+                onClick={handleGetTestETH}
+                disabled={isFaucetLoading}
+                className="w-full py-4 text-lg font-semibold bg-gradient-to-r from-emerald-600 to-teal-600 hover:brightness-110 disabled:opacity-60 rounded-2xl transition-all duration-200 shadow-xl flex items-center justify-center gap-3"
+              >
+                {isFaucetLoading ? '⏳ Waiting for faucet...' : '💧 Get Free Test ETH (0.5 ETH)'}
+              </button>
 
               {/* Send Section */}
               <div className="space-y-6">
