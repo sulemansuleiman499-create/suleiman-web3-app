@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Suleiman Web3 Wallet Sender
 
-## Getting Started
+A clean, modern Web3 dApp that lets users connect their MetaMask wallet, view their Sepolia balance, claim free test ETH, and send test ETH to any address.
 
-First, run the development server:
+Built as a **portfolio project** to showcase Web3 frontend development skills.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## ✨ Live Demo
+**https://suleiman-web3-app.vercel.app**
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🎯 Key Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Wallet connection with RainbowKit
+- Real-time ETH balance display (Sepolia testnet)
+- "Get Free Test ETH" button (opens reliable faucet)
+- Send 0.001 test ETH to any wallet address
+- Modern dark UI with gradients and glassmorphism
+- Fully responsive design
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🛠 Tech Stack
 
-## Learn More
+- Next.js 16 (App Router)
+- TypeScript
+- Tailwind CSS
+- Wagmi v2 + Viem
+- RainbowKit + Reown (WalletConnect)
+- Vercel Deployment
 
-To learn more about Next.js, take a look at the following resources:
+## 📸 Screenshots
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+*(You can add screenshots of the live app here later)*
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🧪 How to Test
 
-## Deploy on Vercel
+1. Visit the [live link](https://suleiman-web3-app.vercel.app)
+2. Connect MetaMask wallet
+3. Switch to **Sepolia testnet**
+4. Click **"Get Free Test ETH"** to claim funds
+5. Paste any address and send test ETH
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 💼 What This Project Demonstrates
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Wallet integration using Wagmi + RainbowKit
+- On-chain transaction handling (send ETH)
+- Working with testnet faucets
+- Clean component structure in Next.js App Router
+- Environment variable management
+- Professional deployment on Vercel
+
+## 🚀 Future Enhancements (Planned)
+
+- Custom send amount input
+- Transaction history & status tracking
+- Network switcher
+- Loading animations & better UX
+- Make it a template for clients
+
+---
+
+**Built by Suleiman**  
+Web Developer | Learning Web3  
+Open to freelance opportunities in Web3 frontend development.
+
+Interested in a similar dApp for your project? Feel free to reach out!
