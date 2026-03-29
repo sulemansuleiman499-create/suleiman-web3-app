@@ -5,6 +5,13 @@ import { parseEther } from 'viem';
 import ConnectButton from '../components/ConnectButton';
 import { useState, useEffect } from 'react';
 
+type Transaction = {
+  hash: string;
+  to: string;
+  amount: string;
+  timestamp: string;
+};
+
 export default function Home() {
   const { address, isConnected } = useAccount();
   const { data: balance, refetch } = useBalance({ address });
@@ -14,9 +21,22 @@ export default function Home() {
   const [status, setStatus] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [isFaucetLoading, setIsFaucetLoading] = useState(false);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
 
   const { sendTransaction } = useSendTransaction();
 
+  // Load history from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem('transactions');
+    if (saved) setTransactions(JSON.parse(saved));
+  }, []);
+
+  // Save history to localStorage
+  useEffect(() => {
+    localStorage.setItem('transactions', JSON.stringify(transactions));
+  }, [transactions]);
+
+  // Auto refresh balance after faucet
   useEffect(() => {
     if (isFaucetLoading) {
       const timer = setTimeout(() => {
@@ -35,12 +55,12 @@ export default function Home() {
   };
 
   const handleSend = async () => {
-    if (!recipient) {
-      setStatus('Please enter recipient address');
+    if (!recipient || !amount) {
+      setStatus('Please fill recipient and amount');
       return;
     }
     if (!recipient.startsWith('0x') || recipient.length !== 42) {
-      setStatus('Invalid address');
+      setStatus('Invalid recipient address');
       return;
     }
 
@@ -52,8 +72,21 @@ export default function Home() {
         to: recipient as `0x${string}`,
         value: parseEther(amount),
       });
-      setStatus(`✅ Sent ${amount} ETH! Hash: ${hash}`);
+
+      const newTx: Transaction = {
+        hash,
+        to: recipient,
+        amount,
+        timestamp: new Date().toLocaleString(),
+      };
+
+      setTransactions([newTx, ...transactions]); // Add to top
+
+      setStatus(`✅ Sent ${amount} ETH!`);
       window.open(`https://sepolia.etherscan.io/tx/${hash}`, '_blank');
+
+      // Clear form
+      setRecipient('');
     } catch (err: any) {
       setStatus(`❌ ${err.message || 'Transaction failed'}`);
     } finally {
@@ -81,11 +114,12 @@ export default function Home() {
               <p className="text-zinc-400">Switch to Sepolia testnet in MetaMask</p>
             </div>
           ) : (
-            <div className="space-y-8">
+            <div className="space-y-10">
+              {/* Wallet Info */}
               <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8 space-y-6">
                 <div>
                   <p className="text-xs uppercase tracking-widest text-zinc-500">CONNECTED WALLET</p>
-                  <p className="font-mono text-blue-300 break-all mt-2">{address}</p>
+                  <p className="font-mono text-blue-300 break-all mt-2 text-sm">{address}</p>
                 </div>
                 <div>
                   <p className="text-xs uppercase tracking-widest text-zinc-500">BALANCE</p>
@@ -95,6 +129,7 @@ export default function Home() {
                 </div>
               </div>
 
+              {/* Get Test ETH */}
               <button
                 onClick={handleGetTestETH}
                 disabled={isFaucetLoading}
@@ -103,12 +138,13 @@ export default function Home() {
                 {isFaucetLoading ? '⏳ Processing...' : '💧 Get Free Test ETH'}
               </button>
 
-              <div className="space-y-5">
+              {/* Send Form */}
+              <div className="space-y-6">
                 <div>
                   <label className="block text-sm text-zinc-400 mb-2">Recipient Address</label>
                   <input
                     type="text"
-                    placeholder="0x..."
+                    placeholder="0x1234..."
                     value={recipient}
                     onChange={(e) => setRecipient(e.target.value)}
                     className="w-full px-6 py-5 bg-zinc-900 border border-zinc-800 rounded-3xl focus:border-blue-500 text-white"
@@ -119,7 +155,7 @@ export default function Home() {
                   <label className="block text-sm text-zinc-400 mb-2">Amount (ETH)</label>
                   <input
                     type="number"
-                    step="0.001"
+                    step="0.0001"
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
                     className="w-full px-6 py-5 bg-zinc-900 border border-zinc-800 rounded-3xl focus:border-blue-500 text-white"
@@ -135,7 +171,32 @@ export default function Home() {
                 </button>
               </div>
 
-              {status && <div className="p-5 rounded-3xl text-center border border-zinc-700 bg-zinc-900">{status}</div>}
+              {/* Transaction History */}
+              {transactions.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-semibold text-white mb-4">Recent Transactions</h3>
+                  <div className="space-y-3 max-h-80 overflow-y-auto pr-2">
+                    {transactions.map((tx, index) => (
+                      <div key={index} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-emerald-400">Sent {tx.amount} ETH</span>
+                          <a
+                            href={`https://sepolia.etherscan.io/tx/${tx.hash}`}
+                            target="_blank"
+                            className="text-blue-400 hover:underline"
+                          >
+                            View →
+                          </a>
+                        </div>
+                        <p className="text-zinc-400 text-xs mt-1 break-all">To: {tx.to}</p>
+                        <p className="text-zinc-500 text-xs mt-2">{tx.timestamp}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {status && <div className="p-5 rounded-3xl text-center border border-zinc-700 bg-zinc-900 text-sm">{status}</div>}
             </div>
           )}
 
