@@ -61,56 +61,51 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-950 to-black flex items-center justify-center p-6 overflow-hidden">
-      {/* Background accent */}
-      <div className="absolute inset-0 bg-[radial-gradient(at_top_right,#a855f720_0%,transparent_50%)]"></div>
-
-      <div className="max-w-lg w-full relative z-10">
-        <div className="bg-zinc-900/95 backdrop-blur-3xl border border-purple-400/30 rounded-3xl shadow-2xl p-10 space-y-10">
+    <main className="min-h-screen bg-gradient-to-br from-black via-blue-950 to-purple-950 flex items-center justify-center p-6">
+      <div className="max-w-lg w-full">
+        <div className="bg-zinc-950/95 backdrop-blur-3xl border border-blue-500/30 rounded-3xl shadow-2xl p-10 space-y-10">
 
           {/* Header */}
           <div className="text-center">
-            <div className="mx-auto mb-6 w-24 h-24 bg-gradient-to-br from-violet-500 via-fuchsia-500 to-pink-500 rounded-3xl flex items-center justify-center text-6xl shadow-2xl ring-2 ring-purple-400/30">
+            <div className="mx-auto mb-6 w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-3xl flex items-center justify-center text-6xl shadow-2xl ring-4 ring-blue-500/20">
               🚀
             </div>
-            <h1 className="text-5xl font-bold bg-gradient-to-r from-white via-purple-200 to-pink-200 bg-clip-text text-transparent tracking-tighter">
-              Suleiman Web3
-            </h1>
-            <p className="text-purple-400 text-2xl mt-2 font-light">Wallet Sender</p>
+            <h1 className="text-5xl font-bold text-white tracking-tighter">Suleiman Web3</h1>
+            <p className="text-blue-400 text-2xl mt-2">Wallet Sender</p>
           </div>
 
           {!isConnected ? (
             <div className="text-center py-12 space-y-8">
-              <p className="text-3xl text-zinc-100">Ready to send test ETH?</p>
+              <p className="text-3xl text-white">Ready to send test ETH?</p>
               <ConnectButton />
               <p className="text-zinc-400">Make sure you're on Sepolia testnet in MetaMask</p>
             </div>
           ) : (
             <div className="space-y-9">
-              {/* Wallet Card */}
-              <div className="bg-zinc-800/70 border border-zinc-700 rounded-3xl p-8 space-y-6">
+              {/* Wallet Info */}
+              <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8 space-y-6">
                 <div>
-                  <p className="text-xs uppercase tracking-widest text-zinc-500">Connected Wallet</p>
-                  <p className="font-mono text-purple-300 break-all mt-2 text-sm">{address}</p>
+                  <p className="text-xs uppercase tracking-widest text-zinc-500">CONNECTED WALLET</p>
+                  <p className="font-mono text-blue-300 break-all mt-2 text-sm">{address}</p>
                 </div>
                 <div>
-                  <p className="text-xs uppercase tracking-widest text-zinc-500">Balance</p>
+                  <p className="text-xs uppercase tracking-widest text-zinc-500">BALANCE</p>
                   <p className="text-5xl font-semibold text-emerald-400 mt-2">
                     {balance ? parseFloat(balance.formatted).toFixed(4) : '0.0000'} <span className="text-2xl">ETH</span>
                   </p>
                 </div>
               </div>
 
-              {/* Faucet Button */}
+              {/* Get Free Test ETH */}
               <button
                 onClick={handleGetTestETH}
                 disabled={isFaucetLoading}
-                className="w-full py-5 text-lg font-semibold bg-gradient-to-r from-emerald-500 to-cyan-500 hover:brightness-110 disabled:opacity-70 rounded-3xl transition-all flex items-center justify-center gap-3 shadow-xl"
+                className="w-full py-5 text-lg font-semibold bg-gradient-to-r from-emerald-600 to-cyan-500 hover:brightness-110 disabled:opacity-70 rounded-3xl transition-all flex items-center justify-center gap-3 shadow-xl"
               >
                 {isFaucetLoading ? '⏳ Processing...' : '💧 Get Free Test ETH'}
               </button>
 
-              {/* Send Form */}
+              {/* Send Section */}
               <div className="space-y-6">
                 <div>
                   <label className="block text-sm text-zinc-400 mb-3">Recipient Address</label>
@@ -119,14 +114,14 @@ export default function Home() {
                     placeholder="0x1234... paste any address"
                     value={recipient}
                     onChange={(e) => setRecipient(e.target.value)}
-                    className="w-full px-6 py-5 bg-zinc-800 border border-zinc-700 focus:border-purple-500 rounded-3xl text-white placeholder-zinc-500 focus:outline-none text-base"
+                    className="w-full px-6 py-5 bg-zinc-900 border border-zinc-800 focus:border-blue-500 rounded-3xl text-white placeholder-zinc-500 focus:outline-none"
                   />
                 </div>
 
                 <button
                   onClick={handleSend}
                   disabled={isSending || !recipient}
-                  className="w-full py-5 text-xl font-bold bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:brightness-110 disabled:opacity-50 rounded-3xl transition-all shadow-2xl"
+                  className="w-full py-5 text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 hover:brightness-110 disabled:opacity-50 rounded-3xl transition-all shadow-2xl"
                 >
                   {isSending ? 'Sending...' : 'Send 0.001 Test ETH'}
                 </button>
