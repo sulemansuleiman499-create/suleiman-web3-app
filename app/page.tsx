@@ -13,7 +13,7 @@ type Transaction = {
 };
 
 export default function Home() {
-  const { address, isConnected } = useAccount();
+  const { address, isConnected, chain } = useAccount();
   const { data: balance, refetch } = useBalance({ address });
 
   const [recipient, setRecipient] = useState('');
@@ -22,6 +22,7 @@ export default function Home() {
   const [isSending, setIsSending] = useState(false);
   const [isFaucetLoading, setIsFaucetLoading] = useState(false);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   const { sendTransaction } = useSendTransaction();
 
@@ -44,6 +45,14 @@ export default function Home() {
       return () => clearTimeout(timer);
     }
   }, [isFaucetLoading, refetch]);
+
+  const copyAddress = () => {
+    if (address) {
+      navigator.clipboard.writeText(address);
+      setStatus('✅ Address copied to clipboard');
+      setTimeout(() => setStatus(''), 2000);
+    }
+  };
 
   const handleGetTestETH = () => {
     setIsFaucetLoading(true);
@@ -78,11 +87,14 @@ export default function Home() {
       };
 
       setTransactions([newTx, ...transactions]);
+      setShowConfetti(true);
 
-      setStatus(`✅ Sent ${amount} ETH!`);
+      setStatus(`✅ Successfully sent ${amount} ETH! Transaction confirmed.`);
+
       window.open(`https://sepolia.etherscan.io/tx/${hash}`, '_blank');
-
       setRecipient('');
+
+      setTimeout(() => setShowConfetti(false), 3000);
     } catch (err: any) {
       setStatus(`❌ ${err.message || 'Transaction failed'}`);
     } finally {
@@ -91,41 +103,58 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-black via-blue-950 to-purple-950 flex items-center justify-center p-4 sm:p-6">
-      <div className="max-w-lg w-full">
-        <div className="bg-zinc-950/95 backdrop-blur-3xl border border-blue-500/30 rounded-3xl shadow-2xl p-5 sm:p-8 md:p-10 space-y-6 sm:space-y-8">
+    <main className="min-h-screen bg-gradient-to-br from-zinc-950 via-black to-zinc-950 flex items-center justify-center p-4 sm:p-6 overflow-hidden">
+      {/* Subtle background glow */}
+      <div className="absolute inset-0 bg-[radial-gradient(at_center,#3b82f610_0%,transparent_70%)]"></div>
+
+      <div className="max-w-lg w-full relative z-10">
+        <div className="bg-zinc-900/80 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-2xl p-6 sm:p-9 md:p-11 space-y-7 sm:space-y-9">
 
           {/* Header */}
           <div className="text-center">
-            <div className="mx-auto mb-5 sm:mb-6 w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-3xl flex items-center justify-center text-5xl sm:text-6xl shadow-2xl">
+            <div className="mx-auto mb-6 w-20 h-20 sm:w-28 sm:h-28 bg-gradient-to-br from-violet-500 via-fuchsia-500 to-cyan-500 rounded-3xl flex items-center justify-center text-6xl shadow-[0_0_40px_rgb(139,92,246,0.4)]">
               🚀
             </div>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white tracking-tight">Suleiman Web3</h1>
-            <p className="text-blue-400 text-lg sm:text-xl mt-1">Wallet Sender</p>
+            <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent tracking-tighter">
+              Suleiman Web3
+            </h1>
+            <p className="text-violet-400 text-xl mt-1 font-medium">Wallet Sender</p>
           </div>
 
           {!isConnected ? (
-            <div className="text-center py-8 sm:py-12 space-y-6">
-              <p className="text-xl sm:text-2xl md:text-3xl text-white">Ready to send test ETH?</p>
-              <div className="flex justify-center scale-90 sm:scale-100">
+            <div className="text-center py-10 space-y-6">
+              <p className="text-2xl sm:text-3xl text-white">Ready to send test ETH on Sepolia?</p>
+              <div className="flex justify-center">
                 <ConnectButton />
               </div>
-              <p className="text-zinc-400 text-sm sm:text-base">Switch to Sepolia testnet in MetaMask</p>
+              <p className="text-zinc-500">Make sure you're on Sepolia testnet in MetaMask</p>
             </div>
           ) : (
-            <div className="space-y-7 sm:space-y-9">
-              {/* Wallet Info - Fixed address wrapping */}
-              <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 sm:p-8 space-y-6">
+            <div className="space-y-8">
+              {/* Wallet Info Card */}
+              <div className="bg-zinc-950 border border-white/10 rounded-3xl p-7 space-y-6">
                 <div>
-                  <p className="text-xs uppercase tracking-widest text-zinc-500">CONNECTED WALLET</p>
-                  <p className="font-mono text-blue-300 break-all mt-2 text-sm leading-relaxed">
+                  <div className="flex justify-between items-start">
+                    <p className="text-xs uppercase tracking-[2px] text-zinc-500">CONNECTED WALLET</p>
+                    <button
+                      onClick={copyAddress}
+                      className="flex items-center gap-1.5 text-violet-400 hover:text-violet-300 transition text-sm"
+                    >
+                      📋 Copy
+                    </button>
+                  </div>
+                  <p className="font-mono text-zinc-300 break-all mt-3 text-base leading-relaxed tracking-wide">
                     {address}
                   </p>
                 </div>
+
                 <div>
-                  <p className="text-xs uppercase tracking-widest text-zinc-500">BALANCE</p>
-                  <p className="text-4xl sm:text-5xl font-semibold text-emerald-400 mt-1">
-                    {balance ? parseFloat(balance.formatted).toFixed(4) : '0.0000'} ETH
+                  <p className="text-xs uppercase tracking-[2px] text-zinc-500">NETWORK</p>
+                  <p className="text-emerald-400 font-medium mt-1">
+                    {chain?.name || 'Sepolia Testnet'}
+                  </p>
+                  <p className="text-4xl sm:text-5xl font-semibold text-white mt-2 tracking-tighter">
+                    {balance ? parseFloat(balance.formatted).toFixed(4) : '0.0000'} <span className="text-2xl text-zinc-500">ETH</span>
                   </p>
                 </div>
               </div>
@@ -134,21 +163,21 @@ export default function Home() {
               <button
                 onClick={handleGetTestETH}
                 disabled={isFaucetLoading}
-                className="w-full py-4 sm:py-5 bg-gradient-to-r from-emerald-600 to-cyan-500 rounded-3xl font-semibold text-base sm:text-lg hover:brightness-110 transition disabled:opacity-70"
+                className="w-full py-4.5 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:brightness-110 transition font-semibold text-lg rounded-3xl disabled:opacity-70 shadow-lg shadow-emerald-500/30"
               >
                 {isFaucetLoading ? '⏳ Processing...' : '💧 Get Free Test ETH'}
               </button>
 
-              {/* Send Form */}
-              <div className="space-y-5">
+              {/* Send Section */}
+              <div className="space-y-6">
                 <div>
                   <label className="block text-sm text-zinc-400 mb-2">Recipient Address</label>
                   <input
                     type="text"
-                    placeholder="0x1234..."
+                    placeholder="0x..."
                     value={recipient}
                     onChange={(e) => setRecipient(e.target.value)}
-                    className="w-full px-5 py-4 bg-zinc-900 border border-zinc-800 rounded-3xl focus:border-blue-500 text-white text-base outline-none"
+                    className="w-full px-6 py-4 bg-zinc-950 border border-white/10 rounded-3xl focus:border-violet-500 text-white placeholder-zinc-500 outline-none text-base"
                   />
                 </div>
 
@@ -159,14 +188,14 @@ export default function Home() {
                     step="0.0001"
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
-                    className="w-full px-5 py-4 bg-zinc-900 border border-zinc-800 rounded-3xl focus:border-blue-500 text-white text-base outline-none"
+                    className="w-full px-6 py-4 bg-zinc-950 border border-white/10 rounded-3xl focus:border-violet-500 text-white placeholder-zinc-500 outline-none text-base"
                   />
                 </div>
 
                 <button
                   onClick={handleSend}
                   disabled={isSending || !recipient || !amount}
-                  className="w-full py-4 bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl font-bold text-lg hover:brightness-110 transition disabled:opacity-50"
+                  className="w-full py-4.5 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:brightness-110 font-bold text-xl rounded-3xl transition disabled:opacity-60 shadow-lg shadow-violet-600/40"
                 >
                   {isSending ? 'Sending...' : `Send ${amount} ETH`}
                 </button>
@@ -176,22 +205,22 @@ export default function Home() {
               {transactions.length > 0 && (
                 <div>
                   <h3 className="text-lg font-semibold text-white mb-4">Recent Transactions</h3>
-                  <div className="space-y-3 max-h-72 overflow-y-auto pr-2">
+                  <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
                     {transactions.map((tx, index) => (
-                      <div key={index} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 text-sm">
-                        <div className="flex justify-between">
-                          <span className="text-emerald-400">Sent {tx.amount} ETH</span>
+                      <div key={index} className="bg-zinc-950 border border-white/10 rounded-2xl p-5 text-sm">
+                        <div className="flex justify-between items-center">
+                          <span className="text-emerald-400 font-medium">Sent {tx.amount} ETH</span>
                           <a
                             href={`https://sepolia.etherscan.io/tx/${tx.hash}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-blue-400 hover:underline"
+                            className="text-violet-400 hover:text-violet-300"
                           >
-                            View →
+                            View on Etherscan →
                           </a>
                         </div>
-                        <p className="text-zinc-400 text-xs mt-1 break-all">To: {tx.to}</p>
-                        <p className="text-zinc-500 text-xs mt-2">{tx.timestamp}</p>
+                        <p className="text-zinc-500 text-xs mt-3 break-all">To: {tx.to}</p>
+                        <p className="text-zinc-600 text-xs mt-2">{tx.timestamp}</p>
                       </div>
                     ))}
                   </div>
@@ -199,14 +228,14 @@ export default function Home() {
               )}
 
               {status && (
-                <div className="p-5 rounded-3xl text-center border border-zinc-700 bg-zinc-900 text-sm">
+                <div className={`p-5 rounded-3xl text-center text-sm font-medium border transition-all duration-300 ${showConfetti ? 'border-emerald-500 bg-emerald-950/70 text-emerald-300' : 'border-zinc-700 bg-zinc-950'}`}>
                   {status}
                 </div>
               )}
             </div>
           )}
 
-          <div className="flex justify-center pt-4">
+          <div className="flex justify-center pt-2">
             <ConnectButton />
           </div>
         </div>
