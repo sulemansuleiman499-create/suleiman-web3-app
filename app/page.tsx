@@ -93,7 +93,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-black via-blue-950 to-purple-950 flex items-center justify-center p-4 sm:p-6">
       <div className="max-w-lg w-full">
-        <div className="bg-zinc-950/95 backdrop-blur-3xl border border-blue-500/30 rounded-3xl shadow-2xl p-5 sm:p-8 md:p-10 space-y-6 sm:space-y-8 md:space-y-10">
+        <div className="bg-zinc-950/95 backdrop-blur-3xl border border-blue-500/30 rounded-3xl shadow-2xl p-5 sm:p-8 md:p-10 space-y-6 sm:space-y-8">
 
           {/* Header */}
           <div className="text-center">
@@ -114,11 +114,13 @@ export default function Home() {
             </div>
           ) : (
             <div className="space-y-7 sm:space-y-9">
-              {/* Wallet Info */}
+              {/* Wallet Info - Fixed address wrapping */}
               <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 sm:p-8 space-y-6">
                 <div>
                   <p className="text-xs uppercase tracking-widest text-zinc-500">CONNECTED WALLET</p>
-                  <p className="font-mono text-blue-300 break-all mt-2 text-sm">{address}</p>
+                  <p className="font-mono text-blue-300 break-all mt-2 text-sm leading-relaxed">
+                    {address}
+                  </p>
                 </div>
                 <div>
                   <p className="text-xs uppercase tracking-widest text-zinc-500">BALANCE</p>
